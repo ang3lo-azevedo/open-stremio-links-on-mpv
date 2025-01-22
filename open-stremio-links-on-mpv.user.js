@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Open Stremio Links on MPV
-// @version        1.8
+// @version        1.9
 // @description    Replaces the links when the option "M3U Playlist" is active and opens them on MPV
 // @author         Ângelo Azevedo
 // @match          *://web.stremio.com/*
@@ -31,9 +31,11 @@
         const links = document.querySelectorAll('a[href^="data:application/octet-stream;charset=utf-8;base64,"]');
 
         links.forEach(link => {
+            // Check if the link has already been processed (to avoid double processing)
             if (link.dataset.processed) return;
 
-            const streamContainer = link.closest('.stream-container-JPdah, .streams-container-bbSc4');
+            // Check if the link is inside a stream container
+            const streamContainer = link.closest('.stream-container-JPdah');
             if (!streamContainer) return;
 
             const decodedUrl = decodeDataUrl(link.href);
@@ -41,13 +43,16 @@
                 link.href = `mpv:///open?url=${encodeURIComponent(decodedUrl)}&player=mpv`;
                 link.dataset.processed = 'true';
 
-                // Add a click event listener to the link
+                // Add a click event listener to the link to prevent the opening of a new tab
                 link.addEventListener('click', (event) => {
                     event.preventDefault();
                     
                     const mpvUrl = link.href;
+
+                    // Check if a new window is opened
                     const mpvWindow = window.open(mpvUrl, '_blank');
                     if (mpvWindow) {
+                        // If a new window is opened, close it
                         mpvWindow.close();
                     }
                 });
