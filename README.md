@@ -1,3 +1,9 @@
+`The script is still in development phase`
+
+> ### TODO:
+>
+> * [ ]  Change the protocol to be [akiirui one](https://github.com/akiirui/mpv-handler) and base some part of the script on [this one](https://greasyfork.org/en/scripts/416271-play-with-mpv)
+
 # Open Stremio Web Links on MPV
 
 > This script is intended to be used with the [Stremio Web](https://web.stremio.com/) website and the [MPV](https://mpv.io/) player.
@@ -9,4 +15,3 @@
 > 3. [Click here to install this script on Greasemonkey / Tampermonkey](https://github.com/ang3lo-azevedo/open-stremio-links-on-mpv/raw/refs/heads/main/open-stremio-links-on-mpv.user.js)
 > 4. Go to [Stremio Web Settings](https://web.stremio.com/#/settings) and enable in the "Play in external player" option under "Advanced" the "M3U Playlist" option.
 > 5. Click on a stream link and it will open on MPV!
-
