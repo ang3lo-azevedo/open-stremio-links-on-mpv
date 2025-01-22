@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Open Stremio Links on MPV
-// @version        2.1
+// @version        2.2
 // @description    Replaces the links when the option "M3U Playlist" is active and opens them on MPV
 // @author         Ângelo Azevedo
 // @match          *://web.stremio.com/*
