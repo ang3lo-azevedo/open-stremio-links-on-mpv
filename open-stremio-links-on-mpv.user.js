@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Open Stremio Links on MPV
-// @version        1.7
+// @version        1.8
 // @description    Replaces the links when the option "M3U Playlist" is active and opens them on MPV
 // @author         Ângelo Azevedo
 // @match          *://web.stremio.com/*
@@ -33,7 +33,7 @@
         links.forEach(link => {
             if (link.dataset.processed) return;
 
-            const streamContainer = link.closest('.stream-container-JPdah');
+            const streamContainer = link.closest('.stream-container-JPdah, .streams-container-bbSc4');
             if (!streamContainer) return;
 
             const decodedUrl = decodeDataUrl(link.href);
