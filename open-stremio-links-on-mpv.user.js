@@ -4,6 +4,7 @@
 // @description    Replaces the links when the option "M3U Playlist" is active and opens them on MPV
 // @author         Ângelo Azevedo
 // @match          *://web.stremio.com/*
+// @match          *://zaarrg.github.io/stremio-web-shell-fixes/*
 // @downloadURL    https://github.com/ang3lo-azevedo/open-stremio-links-on-mpv/raw/refs/heads/main/open-stremio-links-on-mpv.user.js
 // @updateURL      https://github.com/ang3lo-azevedo/open-stremio-links-on-mpv/raw/refs/heads/main/open-stremio-links-on-mpv.user.js
 // @grant          none
