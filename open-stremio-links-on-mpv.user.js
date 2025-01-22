@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Open Stremio Links on MPV
-// @version        1.4
+// @version        1.5
 // @description    Replaces the links when the option "M3U Playlist" is active and opens them on MPV
 // @author         Ângelo Azevedo
 // @match          *://web.stremio.com/*
@@ -39,11 +39,17 @@
             if (decodedUrl) {
                 // Modificar o link original
                 link.href = `mpv:///open?url=${encodeURIComponent(decodedUrl)}&player=mpv`;
+                link.dataset.processed = 'true'; // Marcar o link como processado
 
                 // Add a click event listener to the link
                 link.addEventListener('click', (event) => {
                     event.preventDefault();
-                    window.location.href = link.href;
+                    
+                    const mpvUrl = link.href;
+                    const mpvWindow = window.open(mpvUrl, '_blank');
+                    if (mpvWindow) {
+                        mpvWindow.close();
+                    }
                 });
             }
         });
