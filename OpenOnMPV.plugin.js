@@ -2,7 +2,7 @@
 /**
  * @name Open Stremio Links on MPV
  * @description Replaces the links when the option "M3U Playlist" is active and opens them on MPV
- * @updateUrl none
+ * @updateUrl https://github.com/ang3lo-azevedo/open-stremio-links-on-mpv/raw/refs/heads/main/OpenOnMPV.plugin.js
  * @version 2.3
  * @author Ângelo Azevedo
  */
