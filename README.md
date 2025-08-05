@@ -91,7 +91,7 @@ Open browser developer console (F12) to see script debug information and process
 
 ## Technical Details
 
-- **Version**: 3.7
+- **Version**: 3.9
 - **mpv-handler Version**: v0.3.15
 - **Supported Browsers**: Chrome, Firefox, Edge, Safari (with appropriate userscript managers)
 - **Dependencies**: GM_config library for settings management
@@ -109,6 +109,16 @@ MIT License - see the script header for full license text.
 Ângelo Azevedo
 
 ## Changelog
+
+### v3.9
+- Removed all debug console logs for cleaner operation
+- Silent background processing without console pollution
+
+### v3.8
+- Fixed multiple MPV instances opening on single click
+- Added throttling to prevent excessive processing
+- Improved event listener management with cloning technique
+- Enhanced link processing reliability
 
 ### v3.7
 - Added English menu commands
