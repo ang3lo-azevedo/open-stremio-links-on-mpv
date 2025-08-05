@@ -8,7 +8,7 @@
 // @description:pt-BR   Substitui os links quando a opção "M3U Playlist" está ativa e os abre no MPV via mpv-handler
 // @description:pt-PT   Substitui as ligações quando a opção "M3U Playlist" está activa e abre-as no MPV via mpv-handler
 // @namespace           open-stremio-links-on-mpv
-// @version             3.3
+// @version             3.7
 // @author              Ângelo Azevedo
 // @license             MIT License
 // @icon                data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmVyc2lvbj0iMSI+CiA8Y2lyY2xlIHN0eWxlPSJvcGFjaXR5Oi4yIiBjeD0iMzIiIGN5PSIzMyIgcj0iMjgiLz4KIDxjaXJjbGUgc3R5bGU9ImZpbGw6IzhkMzQ4ZSIgY3g9IjMyIiBjeT0iMzIiIHI9IjI4Ii8+CiA8Y2lyY2xlIHN0eWxlPSJvcGFjaXR5Oi4zIiBjeD0iMzQuNSIgY3k9IjI5LjUiIHI9IjIwLjUiLz4KIDxjaXJjbGUgc3R5bGU9Im9wYWNpdHk6LjIiIGN4PSIzMiIgY3k9IjMzIiByPSIxNCIvPgogPGNpcmNsZSBzdHlsZT0iZmlsbDojZmZmZmZmIiBjeD0iMzIiIGN5PSIzMiIgcj0iMTQiLz4KIDxwYXRoIHN0eWxlPSJmaWxsOiM2OTFmNjkiIHRyYW5zZm9ybT0ibWF0cml4KDEuNTE1NTQ0NSwwLDAsMS41LC0zLjY1Mzg3OSwtNC45ODczODQ4KSIgZD0ibTI3LjE1NDUxNyAyNC42NTgyNTctMy40NjQxMDEgMi0zLjQ2NDEwMiAxLjk5OTk5OXYtNC0zLjk5OTk5OWwzLjQ2NDEwMiAyeiIvPgogPHBhdGggc3R5bGU9ImZpbGw6I2ZmZmZmZjtvcGFjaXR5Oi4xIiBkPSJNIDMyIDQgQSAyOCAyOCAwIDAgMCA0IDMyIEEgMjggMjggMCAwIDAgNC4wMjE0ODQ0IDMyLjU4NTkzOCBBIDI4IDI4IDAgMCAxIDMyIDUgQSAyOCAyOCAwIDAgMSA1OS45Nzg1MTYgMzIuNDE0MDYyIEEgMjggMjggMCAwIDAgNjAgMzIgQSAyOCAyOCAwIDAgMCAzMiA0IHoiLz4KPC9zdmc+Cg==
@@ -17,6 +17,7 @@
 // @grant               GM_getValue
 // @grant               GM_setValue
 // @grant               GM_notification
+// @grant               GM_registerMenuCommand
 // @run-at              document-idle
 // @noframes
 // @match               *://web.stremio.com/*
@@ -66,68 +67,6 @@ IDIuOTg2MzI4MSBMIDExLjUxMTcxOSAzLjc3MzQzNzUgQSA1LjUgNS41IDAgMCAwIDkuOTAwMzkw\
 NiAyLjg0OTYwOTQgTCA5Ljc1IDEgTCA2LjI1IDEgeiBNIDggNiBBIDIgMiAwIDAgMSAxMCA4IEEg\
 MiAyIDAgMCAxIDggMTAgQSAyIDIgMCAwIDEgNiA4IEEgMiAyIDAgMCAxIDggNiB6IiB0cmFuc2Zv\
 cm09InRyYW5zbGF0ZSg0IDQpIi8+Cjwvc3ZnPgo=";
-
-const STREMIO_CSS = css`
-  .stremio-mpv-button {
-    width: 48px;
-    height: 48px;
-    border: 0;
-    border-radius: 50%;
-    background-size: 48px;
-    background-image: url(data:image/svg+xml;base64,${ICON_MPV});
-    background-repeat: no-repeat;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-  }
-  .stremio-mpv-button:hover {
-    transform: scale(1.1);
-    opacity: 0.8;
-  }
-  .stremio-mpv-settings {
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.2s ease-in-out;
-    display: block;
-    position: absolute;
-    top: -32px;
-    width: 32px;
-    height: 32px;
-    margin-left: 8px;
-    border: 0;
-    border-radius: 50%;
-    background-size: 32px;
-    background-color: #eeeeee;
-    background-image: url(data:image/svg+xml;base64,${ICON_SETTINGS});
-    background-repeat: no-repeat;
-    cursor: pointer;
-  }
-  .stremio-mpv-container {
-    z-index: 99999;
-    position: fixed;
-    left: 8px;
-    bottom: 8px;
-  }
-  .stremio-mpv-button:hover + .stremio-mpv-settings,
-  .stremio-mpv-settings:hover {
-    opacity: 1;
-    visibility: visible;
-    transition: all 0.2s ease-in-out;
-  }
-  .stremio-mpv-processed {
-    color: #8d348e !important;
-    font-weight: bold;
-    background-color: rgba(141, 52, 142, 0.1) !important;
-    border: 1px solid #8d348e !important;
-    border-radius: 4px !important;
-    padding: 2px 6px !important;
-    text-decoration: none !important;
-  }
-  .stremio-mpv-processed:hover {
-    background-color: rgba(141, 52, 142, 0.2) !important;
-    transform: scale(1.02);
-    transition: all 0.2s ease-in-out;
-  }
-`;
 
 const CONFIG_ID = "stremio-mpv-config";
 
@@ -337,9 +276,6 @@ function processLinks() {
       link.href = mpvHandlerUrl;
       link.dataset.processed = 'true';
       processedCount++;
-      
-      // Add visual indicator that link has been processed
-      link.classList.add('stremio-mpv-processed');
 
       // Add a click event listener to prevent opening new tabs
       link.addEventListener('click', (event) => {
@@ -378,49 +314,23 @@ function notifyUpdate() {
   }
 }
 
-// Add control button to page
-function createControlButton() {
-  let head = document.getElementsByTagName("head")[0];
-  let style = document.createElement("style");
-
-  if (head) {
-    style.textContent = STREMIO_CSS.trim();
-    head.appendChild(style);
-  }
-
-  let body = document.body;
-  let buttonDiv = document.createElement("div");
-  let buttonPlay = document.createElement("button");
-  let buttonSettings = document.createElement("button");
-
-  if (body) {
-    buttonPlay.className = "stremio-mpv-button";
-    buttonPlay.title = "Process Stremio links for MPV";
-    buttonPlay.addEventListener("click", () => {
-      processLinks();
-      // Show a brief notification only when manually triggered
-      GM_notification({
-        title: 'Stremio MPV',
-        text: 'Processing Stremio links...',
-        timeout: 1000
-      });
+// Register menu commands for easy access to settings
+function registerMenuCommands() {
+  GM_registerMenuCommand("MPV Settings", () => {
+    if (!GM_config.isOpen) {
+      GM_config.open();
+      GM_config.frame.style = CONFIG_IFRAME_CSS.trim();
+    }
+  });
+  
+  GM_registerMenuCommand("Process Links Manually", () => {
+    processLinks();
+    GM_notification({
+      title: 'Stremio MPV',
+      text: 'Processing Stremio links...',
+      timeout: 2000
     });
-
-    buttonSettings.className = "stremio-mpv-settings";
-    buttonSettings.title = "MPV Settings";
-    buttonSettings.addEventListener("click", () => {
-      if (!GM_config.isOpen) {
-        GM_config.open();
-        GM_config.frame.style = CONFIG_IFRAME_CSS.trim();
-      }
-    });
-
-    buttonDiv.className = "stremio-mpv-container";
-    buttonDiv.appendChild(buttonPlay);
-    buttonDiv.appendChild(buttonSettings);
-
-    body.appendChild(buttonDiv);
-  }
+  });
 }
 
 // Create a MutationObserver to watch for DOM changes
@@ -451,7 +361,7 @@ if (window.trustedTypes && window.trustedTypes.createPolicy) {
 // Initialize the script
 function init() {
   notifyUpdate();
-  createControlButton();
+  registerMenuCommands();
   startObserver();
   // Initial processing
   processLinks();
