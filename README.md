@@ -1,19 +1,6 @@
 # Open Stremio Links on MPV
 
-> This sc## Configuration Options
-
-| Setting | Description | Options |
-|---------|-------------|---------|
-| **MPV Profile** | Custom MPV profile to use | Any profile name (default: "default") |
-| **Video Quality** | Preferred video quality | 2160p, 1440p, 1080p, 720p, 480p, 360p |
-| **Run With Console** | Show console when launching MPV | Yes / No |
-
-## Supported Sites
-
-- [Stremio Web](https://web.stremio.com/) (Official)
-- [Stremio Web Shell](https://stremio.zarg.me/) (Community)
-
-## Requirementssigned to work with [Stremio Web](https://web.stremio.com/) and the [MPV](https://mpv.io/) player, automatically converting Stremio stream links to open directly in MPV via the mpv-handler protocol.
+> This script is designed to work with [Stremio Web](https://web.stremio.com/) and the [MPV](https://mpv.io/) player, automatically converting Stremio stream links to open directly in MPV via the mpv-handler protocol.
 
 ## Features
 
@@ -40,7 +27,7 @@
    - Under "Advanced" → "Play in external player"
    - Enable the **"M3U Playlist"** option
 5. **Configure the Script** (optional):
-   - Click the settings button that appears when hovering over the MPV button
+   - Click the settings button (⚙️) that appears when hovering over the MPV button
    - Customize MPV profile, video quality, and console options
 
 ### Usage:
@@ -64,7 +51,7 @@
 - **MPV Player**: [Download MPV](https://mpv.io/installation/)
 - **mpv-handler**: [Download mpv-handler](https://github.com/akiirui/mpv-handler/releases/latest)
 
-## Troubleshooting
+## 🛠️ Troubleshooting
 
 ### Links not opening in MPV?
 1. Ensure mpv-handler is properly installed and configured
@@ -79,7 +66,7 @@
 ### Multiple tabs opening?
 The script automatically prevents blank tabs from opening when clicking MPV links.
 
-## Contributing
+## 🤝 Contributing
 
 Feel free to contribute to this project by:
 - Reporting bugs and issues
@@ -87,11 +74,11 @@ Feel free to contribute to this project by:
 - Submitting pull requests
 - Improving documentation
 
-## License
+## 📝 License
 
 This project is licensed under the MIT License.
 
-## Acknowledgments
+## 🙏 Acknowledgments
 
 - Based on the excellent [Play with MPV](https://greasyfork.org/en/scripts/416271-play-with-mpv) script
 - Uses [mpv-handler](https://github.com/akiirui/mpv-handler) for protocol handling
