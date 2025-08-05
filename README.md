@@ -44,14 +44,14 @@
 | **Video Quality** | Preferred video quality | 2160p, 1440p, 1080p, 720p, 480p, 360p |
 | **Run With Console** | Show console when launching MPV | Yes / No |
 
-## 📋 Requirements
+## Requirements
 
 - **Browser**: Chrome, Firefox, Safari, or any modern browser
 - **Userscript Manager**: Tampermonkey or Greasemonkey extension
 - **MPV Player**: [Download MPV](https://mpv.io/installation/)
 - **mpv-handler**: [Download mpv-handler](https://github.com/akiirui/mpv-handler/releases/latest)
 
-## 🛠️ Troubleshooting
+## Troubleshooting
 
 ### Links not opening in MPV?
 1. Ensure mpv-handler is properly installed and configured
@@ -66,7 +66,7 @@
 ### Multiple tabs opening?
 The script automatically prevents blank tabs from opening when clicking MPV links.
 
-## 🤝 Contributing
+## Contributing
 
 Feel free to contribute to this project by:
 - Reporting bugs and issues
@@ -74,11 +74,11 @@ Feel free to contribute to this project by:
 - Submitting pull requests
 - Improving documentation
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Based on the excellent [Play with MPV](https://greasyfork.org/en/scripts/416271-play-with-mpv) script
 - Uses [mpv-handler](https://github.com/akiirui/mpv-handler) for protocol handling
