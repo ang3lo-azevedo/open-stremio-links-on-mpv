@@ -8,7 +8,7 @@
 // @description:pt-BR   Substitui os links quando a opção "M3U Playlist" está ativa e os abre no MPV via mpv-handler
 // @description:pt-PT   Substitui as ligações quando a opção "M3U Playlist" está activa e abre-as no MPV via mpv-handler
 // @namespace           open-stremio-links-on-mpv
-// @version             2.8
+// @version             2.9
 // @author              Ângelo Azevedo
 // @license             MIT License
 // @icon                data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmVyc2lvbj0iMSI+CiA8Y2lyY2xlIHN0eWxlPSJvcGFjaXR5Oi4yIiBjeD0iMzIiIGN5PSIzMyIgcj0iMjgiLz4KIDxjaXJjbGUgc3R5bGU9ImZpbGw6IzhkMzQ4ZSIgY3g9IjMyIiBjeT0iMzIiIHI9IjI4Ii8+CiA8Y2lyY2xlIHN0eWxlPSJvcGFjaXR5Oi4zIiBjeD0iMzQuNSIgY3k9IjI5LjUiIHI9IjIwLjUiLz4KIDxjaXJjbGUgc3R5bGU9Im9wYWNpdHk6LjIiIGN4PSIzMiIgY3k9IjMzIiByPSIxNCIvPgogPGNpcmNsZSBzdHlsZT0iZmlsbDojZmZmZmZmIiBjeD0iMzIiIGN5PSIzMiIgcj0iMTQiLz4KIDxwYXRoIHN0eWxlPSJmaWxsOiM2OTFmNjkiIHRyYW5zZm9ybT0ibWF0cml4KDEuNTE1NTQ0NSwwLDAsMS41LC0zLjY1Mzg3OSwtNC45ODczODQ4KSIgZD0ibTI3LjE1NDUxNyAyNC42NTgyNTctMy40NjQxMDEgMi0zLjQ2NDEwMiAxLjk5OTk5OXYtNC0zLjk5OTk5OWwzLjQ2NDEwMiAyeiIvPgogPHBhdGggc3R5bGU9ImZpbGw6I2ZmZmZmZjtvcGFjaXR5Oi4xIiBkPSJNIDMyIDQgQSAyOCAyOCAwIDAgMCA0IDMyIEEgMjggMjggMCAwIDAgNC4wMjE0ODQ0IDMyLjU4NTkzOCBBIDI4IDI4IDAgMCAxIDMyIDUgQSAyOCAyOCAwIDAgMSA1OS45Nzg1MTYgMzIuNDE0MDYyIEEgMjggMjggMCAwIDAgNjAgMzIgQSAyOCAyOCAwIDAgMCAzMiA0IHoiLz4KPC9zdmc+Cg==
@@ -272,10 +272,18 @@ function decodeDataUrl(dataUrl) {
   try {
     const base64Data = dataUrl.split(',')[1];
     const decodedData = atob(base64Data);
-    const match = decodedData.match(/(https:\/\/.*\.*)/);
-    return match ? match[1] : null;
+    
+    // Look for HTTP/HTTPS URLs in the decoded data
+    const urlMatch = decodedData.match(/(https?:\/\/[^\s\n\r]+)/);
+    if (urlMatch) {
+      return urlMatch[1];
+    }
+    
+    // If no URL found, log the decoded content for debugging
+    console.log('Stremio MPV: Decoded data without URL:', decodedData);
+    return null;
   } catch (e) {
-    console.error('Failed to decode data URL:', e);
+    console.error('Stremio MPV: Failed to decode data URL:', e);
     return null;
   }
 }
@@ -283,6 +291,7 @@ function decodeDataUrl(dataUrl) {
 // Function to process links with enhanced mpv-handler integration
 function processLinks() {
   const links = document.querySelectorAll('a[href^="data:application/octet-stream;charset=utf-8;base64,"]');
+  let processedCount = 0;
 
   links.forEach(link => {
     // Check if the link has already been processed
@@ -294,16 +303,10 @@ function processLinks() {
       const mpvHandlerUrl = generateProto(decodedUrl);
       link.href = mpvHandlerUrl;
       link.dataset.processed = 'true';
+      processedCount++;
       
       // Add visual indicator that link has been processed
       link.classList.add('stremio-mpv-processed');
-      
-      // Show notification when link is ready
-      GM_notification({
-        title: 'Stremio MPV',
-        text: 'Stream link ready for MPV',
-        timeout: 2000
-      });
 
       // Add a click event listener to prevent opening new tabs
       link.addEventListener('click', (event) => {
@@ -320,6 +323,11 @@ function processLinks() {
       });
     }
   });
+
+  // Only show notification if links were actually processed
+  if (processedCount > 0) {
+    console.log(`Stremio MPV: Processed ${processedCount} stream link(s)`);
+  }
 }
 
 // Notify update about mpv-handler
@@ -360,10 +368,11 @@ function createControlButton() {
     buttonPlay.title = "Process Stremio links for MPV";
     buttonPlay.addEventListener("click", () => {
       processLinks();
+      // Show a brief notification only when manually triggered
       GM_notification({
         title: 'Stremio MPV',
         text: 'Processing Stremio links...',
-        timeout: 1500
+        timeout: 1000
       });
     });
 
