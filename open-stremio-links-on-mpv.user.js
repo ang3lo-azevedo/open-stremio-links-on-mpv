@@ -189,9 +189,9 @@ function generateProto(url) {
   let proto;
 
   if (console === "yes") {
-    proto = "mpv-debug://play/" + btoaUrl(url);
+    proto = "mpv-handler-debug://play/" + btoaUrl(url);
   } else {
-    proto = "mpv://play/" + btoaUrl(url);
+    proto = "mpv-handler://play/" + btoaUrl(url);
   }
 
   if (profile !== "default" && profile !== "") {
@@ -249,8 +249,8 @@ function processLinks() {
   let processedCount = 0;
 
   links.forEach((link, index) => {
-    // Check if the link has already been processed and actually has an mpv:// URL
-    if (link.dataset.processed === 'true' && (link.href.startsWith('mpv://') || link.href.startsWith('mpv-debug://'))) {
+    // Check if the link has already been processed and actually has an mpv-handler:// URL
+    if (link.dataset.processed === 'true' && (link.href.startsWith('mpv-handler://') || link.href.startsWith('mpv-handler-debug://'))) {
       return;
     }
 
