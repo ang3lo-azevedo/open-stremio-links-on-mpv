@@ -243,9 +243,141 @@ function decodeDataUrl(dataUrl) {
   }
 }
 
+function padBase64(value) {
+  const padding = value.length % 4;
+  if (padding === 0) {
+    return value;
+  }
+
+  return value + "=".repeat(4 - padding);
+}
+
+function safeJsonParse(value) {
+  try {
+    return JSON.parse(value);
+  } catch (e) {
+    return null;
+  }
+}
+
+function extractJsonObject(text) {
+  const start = text.indexOf("{");
+  const end = text.lastIndexOf("}");
+
+  if (start === -1 || end === -1 || end <= start) {
+    return null;
+  }
+
+  return safeJsonParse(text.slice(start, end + 1));
+}
+
+function buildMagnetFromInfoHash(streamData) {
+  if (!streamData || !streamData.infoHash) {
+    return null;
+  }
+
+  const magnet = new URLSearchParams();
+  magnet.append("xt", "urn:btih:" + streamData.infoHash);
+
+  if (streamData.name) {
+    magnet.append("dn", streamData.name);
+  }
+
+  if (Array.isArray(streamData.announce)) {
+    streamData.announce.forEach((tracker) => {
+      if (typeof tracker === "string" && tracker.trim() !== "") {
+        magnet.append("tr", tracker.trim());
+      }
+    });
+  }
+
+  return "magnet:?" + magnet.toString();
+}
+
+function decodePlayerPayload(payload) {
+  const candidates = [payload, payload.replace(/-/g, "+").replace(/_/g, "/")];
+
+  for (const candidate of candidates) {
+    try {
+      const decoded = atob(padBase64(candidate));
+      const parsed = extractJsonObject(decoded);
+
+      if (parsed) {
+        return parsed;
+      }
+    } catch (e) {
+      // Ignore invalid base64 payloads and continue with the next candidate.
+    }
+  }
+
+  return extractJsonObject(payload);
+}
+
+function decodePlayerRouteUrl(linkUrl) {
+  const marker = "#/player/";
+  const markerIndex = linkUrl.indexOf(marker);
+
+  if (markerIndex === -1) {
+    return null;
+  }
+
+  const route = linkUrl.slice(markerIndex + marker.length);
+
+  // Try to extract direct playable media URLs encoded in the route.
+  try {
+    const decodedRoute = decodeURIComponent(route);
+    const directMediaMatch = decodedRoute.match(/(https?:\/\/[^\s"']+\.(?:m3u8|mpd|mp4|mkv|webm)(?:\?[^\s"']*)?)/i);
+
+    if (directMediaMatch) {
+      return directMediaMatch[1];
+    }
+  } catch (e) {
+    // Ignore decode errors and continue with payload decoding.
+  }
+
+  const payloadEndIndex = route.search(/\/(?:https?|http)%3A%2F%2F/i);
+  const encodedPayload = payloadEndIndex === -1 ? route.split("/")[0] : route.slice(0, payloadEndIndex);
+
+  if (!encodedPayload) {
+    return null;
+  }
+
+  let payload;
+
+  try {
+    payload = decodeURIComponent(encodedPayload);
+  } catch (e) {
+    payload = encodedPayload;
+  }
+
+  const streamData = decodePlayerPayload(payload);
+
+  if (!streamData) {
+    return null;
+  }
+
+  if (typeof streamData.url === "string" && streamData.url.trim() !== "") {
+    return streamData.url.trim();
+  }
+
+  return buildMagnetFromInfoHash(streamData);
+}
+
+function extractStreamUrl(linkUrl) {
+  if (linkUrl.startsWith("data:application/octet-stream;charset=utf-8;base64,")) {
+    return decodeDataUrl(linkUrl);
+  }
+
+  if (linkUrl.includes("#/player/")) {
+    return decodePlayerRouteUrl(linkUrl);
+  }
+
+  return null;
+}
+
 // Function to process links with enhanced mpv-handler integration
 function processLinks() {
-  const links = document.querySelectorAll('a[href^="data:application/octet-stream;charset=utf-8;base64,"]');
+  const links = document.querySelectorAll('a[href^="data:application/octet-stream;charset=utf-8;base64,"], a[href*="#/player/"]');
   let processedCount = 0;
 
   links.forEach((link, index) => {
@@ -254,7 +386,7 @@ function processLinks() {
       return;
     }
 
-    const decodedUrl = decodeDataUrl(link.href);
+    const decodedUrl = extractStreamUrl(link.href);
     if (decodedUrl) {
       // Generate mpv-handler protocol URL
       const mpvHandlerUrl = generateProto(decodedUrl);
