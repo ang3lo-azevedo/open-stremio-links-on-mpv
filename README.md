@@ -1,11 +1,13 @@
 # Open Stremio Links on MPV
 
-A powerful userscript that automatically converts Stremio Web stream links to open directly in MPV player using the mpv-handler protocol.
+A userscript that automatically converts Stremio Web stream links to open directly in MPV using mpv-handler.
 
 ## Features
 
-- **Automatic Processing**: Seamlessly converts Stremio stream links without user intervention
+- **Default Stream Behavior**: Left-click on stream links opens them normally in Stremio
+- **Right-Click Context Menu**: Right-click any stream to see "Play on MPV" option
 - **MPV Integration**: Uses mpv-handler protocol for direct MPV player launch
+- **In-page Launch Toast**: Shows a website toast when a stream is being opened in MPV
 - **Multi-language Support**: Available in English, Portuguese (Brazil), and Portuguese (Portugal)
 - **Quality Control**: Configure preferred video quality settings
 - **Profile Support**: Use custom MPV profiles
@@ -37,13 +39,17 @@ Install a userscript manager extension:
 
 ## Usage
 
-### Automatic Operation
-The script works automatically once installed:
+### Playing on MPV
+The script enhances the right-click context menu:
 
 1. **Navigate to Stremio Web**: Go to [web.stremio.com](https://web.stremio.com) or [stremio.zarg.me](https://stremio.zarg.me)
 2. **Enable M3U Playlist**: In Stremio settings, enable the "M3U Playlist" option
-3. **Click Stream Links**: The script automatically converts stream links to MPV protocol
-4. **Enjoy**: Links now open directly in MPV player
+3. **Right-Click a Stream**: Right-click on any stream to bring up the context menu
+4. **Select "Play on MPV"**: Click the "Play on MPV" option from the menu
+5. **See Confirmation**: A small in-page toast appears: "Opening in MPV: ..."
+6. **Enjoy**: The stream opens directly in MPV player
+
+**Note**: Left-clicking stream links opens them normally in Stremio as expected.
 
 ### Configuration
 
@@ -65,10 +71,12 @@ Access configuration through your userscript manager menu:
 
 ## How It Works
 
-1. **Link Detection**: Monitors the page for Stremio stream links (data URI format)
-2. **Base64 Decoding**: Extracts actual HTTP/HTTPS URLs from encoded data
-3. **Protocol Conversion**: Converts URLs to mpv-handler protocol format
-4. **Automatic Launch**: Clicking converted links opens MPV directly
+1. **Link Detection**: Monitors the page for stream links (`data:` and `#/player/` routes)
+2. **Stream Extraction**: Decodes payloads and extracts playable URLs (including magnet fallback when needed)
+3. **Protocol Conversion**: Converts stream URLs to `mpv-handler://` or `mpv-handler-debug://`
+4. **Click Binding**: Ensures MPV links keep a persistent click handler
+5. **User Feedback**: Shows an in-page toast right before launching MPV
+
 ## Troubleshooting
 
 ### Script Not Working
@@ -81,6 +89,11 @@ Access configuration through your userscript manager menu:
 - Check MPV player installation
 - Try with "Run With Console" enabled to see error messages
 
+### Toast Not Showing
+- Refresh the page once after updating the script
+- Make sure you are clicking a converted stream entry (not a normal external link)
+- Check if another extension is blocking page-injected UI elements
+
 ### Links Not Converting
 - Open browser console (F12) to check for error messages
 - Ensure you're on a supported Stremio site
@@ -91,7 +104,7 @@ Open browser developer console (F12) to see script debug information and process
 
 ## Technical Details
 
-- **Version**: 3.9
+- **Version**: 4.5
 - **mpv-handler Version**: v0.3.15
 - **Supported Browsers**: Chrome, Firefox, Edge, Safari (with appropriate userscript managers)
 - **Dependencies**: GM_config library for settings management
@@ -109,6 +122,27 @@ MIT License - see the script header for full license text.
 Ângelo Azevedo
 
 ## Changelog
+
+### v4.5
+- Added "Play on MPV" option to right-click context menu for quick stream launching
+- Restored default left-click behavior (links open normally in Stremio)
+- Improved user control over MPV launching vs default streaming
+
+### v4.4
+- Added in-page "Opening in MPV" toast notification
+- Improved toast visibility timing and styling reliability
+
+### v4.3
+- Replaced system opening notification with website toast
+
+### v4.2
+- Added feedback when launching streams in MPV
+
+### v4.1
+- Fixed repeat-click behavior that could open an unwanted tab
+
+### v4.0
+- Improved persistent MPV click handling for already converted links
 
 ### v3.9
 - Removed all debug console logs for cleaner operation
