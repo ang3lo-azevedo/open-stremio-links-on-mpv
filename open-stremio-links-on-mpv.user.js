@@ -8,7 +8,7 @@
 // @description:pt-BR   Substitui os links quando a opção "M3U Playlist" está ativa e os abre no MPV via mpv-handler
 // @description:pt-PT   Substitui as ligações quando a opção "M3U Playlist" está activa e abre-as no MPV via mpv-handler
 // @namespace           open-stremio-links-on-mpv
-// @version             4.2
+// @version             4.3
 // @author              Ângelo Azevedo
 // @license             MIT License
 // @icon                data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmVyc2lvbj0iMSI+CiA8Y2lyY2xlIHN0eWxlPSJvcGFjaXR5Oi4yIiBjeD0iMzIiIGN5PSIzMyIgcj0iMjgiLz4KIDxjaXJjbGUgc3R5bGU9ImZpbGw6IzhkMzQ4ZSIgY3g9IjMyIiBjeT0iMzIiIHI9IjI4Ii8+CiA8Y2lyY2xlIHN0eWxlPSJvcGFjaXR5Oi4zIiBjeD0iMzQuNSIgY3k9IjI5LjUiIHI9IjIwLjUiLz4KIDxjaXJjbGUgc3R5bGU9Im9wYWNpdHk6LjIiIGN4PSIzMiIgY3k9IjMzIiByPSIxNCIvPgogPGNpcmNsZSBzdHlsZT0iZmlsbDojZmZmZmZmIiBjeD0iMzIiIGN5PSIzMiIgcj0iMTQiLz4KIDxwYXRoIHN0eWxlPSJmaWxsOiM2OTFmNjkiIHRyYW5zZm9ybT0ibWF0cml4KDEuNTE1NTQ0NSwwLDAsMS41LC0zLjY1Mzg3OSwtNC45ODczODQ4KSIgZD0ibTI3LjE1NDUxNyAyNC42NTgyNTctMy40NjQxMDEgMi0zLjQ2NDEwMiAxLjk5OTk5OXYtNC0zLjk5OTk5OWwzLjQ2NDEwMiAyeiIvPgogPHBhdGggc3R5bGU9ImZpbGw6I2ZmZmZmZjtvcGFjaXR5Oi4xIiBkPSJNIDMyIDQgQSAyOCAyOCAwIDAgMCA0IDMyIEEgMjggMjggMCAwIDAgNC4wMjE0ODQ0IDMyLjU4NTkzOCBBIDI4IDI4IDAgMCAxIDMyIDUgQSAyOCAyOCAwIDAgMSA1OS45Nzg1MTYgMzIuNDE0MDYyIEEgMjggMjggMCAwIDAgNjAgMzIgQSAyOCAyOCAwIDAgMCAzMiA0IHoiLz4KPC9zdmc+Cg==
@@ -378,12 +378,27 @@ function extractStreamUrl(linkUrl) {
 function notifyOpeningInMpv(link) {
   const linkText = (link.textContent || "").trim();
   const streamLabel = linkText !== "" ? linkText : "Selected stream";
+  const container = document.querySelector(".toasts-container-oKECy") || document.querySelector("#app");
 
-  GM_notification({
-    title: "Stremio MPV",
-    text: `Opening in MPV: ${streamLabel}`,
-    timeout: 2200,
-  });
+  if (!container) {
+    return;
+  }
+
+  const toast = document.createElement("div");
+  toast.className = "tooltip-container-Qpse8 tooltip-item-gfYXu";
+  toast.textContent = `Opening in MPV: ${streamLabel}`;
+
+  if (!document.querySelector(".toasts-container-oKECy")) {
+    toast.style.position = "fixed";
+    toast.style.right = "16px";
+    toast.style.bottom = "16px";
+  }
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 2200);
 }
 
 function bindMpvClick(link) {
