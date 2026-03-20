@@ -8,7 +8,7 @@
 // @description:pt-BR   Substitui os links quando a opção "M3U Playlist" está ativa e os abre no MPV via mpv-handler
 // @description:pt-PT   Substitui as ligações quando a opção "M3U Playlist" está activa e abre-as no MPV via mpv-handler
 // @namespace           open-stremio-links-on-mpv
-// @version             4.3
+// @version             4.4
 // @author              Ângelo Azevedo
 // @license             MIT License
 // @icon                data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmVyc2lvbj0iMSI+CiA8Y2lyY2xlIHN0eWxlPSJvcGFjaXR5Oi4yIiBjeD0iMzIiIGN5PSIzMyIgcj0iMjgiLz4KIDxjaXJjbGUgc3R5bGU9ImZpbGw6IzhkMzQ4ZSIgY3g9IjMyIiBjeT0iMzIiIHI9IjI4Ii8+CiA8Y2lyY2xlIHN0eWxlPSJvcGFjaXR5Oi4zIiBjeD0iMzQuNSIgY3k9IjI5LjUiIHI9IjIwLjUiLz4KIDxjaXJjbGUgc3R5bGU9Im9wYWNpdHk6LjIiIGN4PSIzMiIgY3k9IjMzIiByPSIxNCIvPgogPGNpcmNsZSBzdHlsZT0iZmlsbDojZmZmZmZmIiBjeD0iMzIiIGN5PSIzMiIgcj0iMTQiLz4KIDxwYXRoIHN0eWxlPSJmaWxsOiM2OTFmNjkiIHRyYW5zZm9ybT0ibWF0cml4KDEuNTE1NTQ0NSwwLDAsMS41LC0zLjY1Mzg3OSwtNC45ODczODQ4KSIgZD0ibTI3LjE1NDUxNyAyNC42NTgyNTctMy40NjQxMDEgMi0zLjQ2NDEwMiAxLjk5OTk5OXYtNC0zLjk5OTk5OWwzLjQ2NDEwMiAyeiIvPgogPHBhdGggc3R5bGU9ImZpbGw6I2ZmZmZmZjtvcGFjaXR5Oi4xIiBkPSJNIDMyIDQgQSAyOCAyOCAwIDAgMCA0IDMyIEEgMjggMjggMCAwIDAgNC4wMjE0ODQ0IDMyLjU4NTkzOCBBIDI4IDI4IDAgMCAxIDMyIDUgQSAyOCAyOCAwIDAgMSA1OS45Nzg1MTYgMzIuNDE0MDYyIEEgMjggMjggMCAwIDAgNjAgMzIgQSAyOCAyOCAwIDAgMCAzMiA0IHoiLz4KPC9zdmc+Cg==
@@ -378,6 +378,7 @@ function extractStreamUrl(linkUrl) {
 function notifyOpeningInMpv(link) {
   const linkText = (link.textContent || "").trim();
   const streamLabel = linkText !== "" ? linkText : "Selected stream";
+  const compactLabel = streamLabel.replace(/\s+/g, " ").slice(0, 72);
   const container = document.querySelector(".toasts-container-oKECy") || document.querySelector("#app");
 
   if (!container) {
@@ -386,15 +387,33 @@ function notifyOpeningInMpv(link) {
 
   const toast = document.createElement("div");
   toast.className = "tooltip-container-Qpse8 tooltip-item-gfYXu";
-  toast.textContent = `Opening in MPV: ${streamLabel}`;
+  toast.textContent = `Opening in MPV: ${compactLabel}`;
 
-  if (!document.querySelector(".toasts-container-oKECy")) {
-    toast.style.position = "fixed";
-    toast.style.right = "16px";
-    toast.style.bottom = "16px";
-  }
+  // Keep the visual feel aligned with Stremio while guaranteeing visibility.
+  toast.style.position = "fixed";
+  toast.style.right = "16px";
+  toast.style.bottom = "16px";
+  toast.style.zIndex = "999999";
+  toast.style.padding = "10px 14px";
+  toast.style.borderRadius = "10px";
+  toast.style.background = "rgba(32, 34, 38, 0.95)";
+  toast.style.color = "#f2f3f5";
+  toast.style.fontSize = "13px";
+  toast.style.lineHeight = "1.3";
+  toast.style.border = "1px solid rgba(255, 255, 255, 0.12)";
+  toast.style.boxShadow = "0 8px 24px rgba(0, 0, 0, 0.35)";
+  toast.style.maxWidth = "360px";
+  toast.style.pointerEvents = "none";
+  toast.style.opacity = "0";
+  toast.style.transform = "translateY(8px)";
+  toast.style.transition = "opacity 140ms ease, transform 140ms ease";
 
   container.appendChild(toast);
+
+  requestAnimationFrame(() => {
+    toast.style.opacity = "1";
+    toast.style.transform = "translateY(0)";
+  });
 
   setTimeout(() => {
     toast.remove();
@@ -413,7 +432,9 @@ function bindMpvClick(link) {
     event.preventDefault();
     event.stopPropagation();
     notifyOpeningInMpv(link);
-    window.location.href = link.href;
+    setTimeout(() => {
+      window.location.href = link.href;
+    }, 120);
   });
 }
 
