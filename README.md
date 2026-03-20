@@ -104,7 +104,7 @@ Open browser developer console (F12) to see script debug information and process
 
 ## Technical Details
 
-- **Version**: 4.5
+- **Version**: 4.6
 - **mpv-handler Version**: v0.3.15
 - **Supported Browsers**: Chrome, Firefox, Edge, Safari (with appropriate userscript managers)
 - **Dependencies**: GM_config library for settings management
@@ -122,6 +122,11 @@ MIT License - see the script header for full license text.
 Ângelo Azevedo
 
 ## Changelog
+
+### v4.6
+- Optimized context menu injection for instant display
+- Positioned "Play on MPV" option at the top of the context menu
+- Reduced loading time for menu option appearance
 
 ### v4.5
 - Added "Play on MPV" option to right-click context menu for quick stream launching

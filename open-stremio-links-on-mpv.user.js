@@ -8,7 +8,7 @@
 // @description:pt-BR   Substitui os links quando a opção "M3U Playlist" está ativa e os abre no MPV via mpv-handler
 // @description:pt-PT   Substitui as ligações quando a opção "M3U Playlist" está activa e abre-as no MPV via mpv-handler
 // @namespace           open-stremio-links-on-mpv
-// @version             4.5
+// @version             4.6
 // @author              Ângelo Azevedo
 // @license             MIT License
 // @icon                data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmVyc2lvbj0iMSI+CiA8Y2lyY2xlIHN0eWxlPSJvcGFjaXR5Oi4yIiBjeD0iMzIiIGN5PSIzMyIgcj0iMjgiLz4KIDxjaXJjbGUgc3R5bGU9ImZpbGw6IzhkMzQ4ZSIgY3g9IjMyIiBjeT0iMzIiIHI9IjI4Ii8+CiA8Y2lyY2xlIHN0eWxlPSJvcGFjaXR5Oi4zIiBjeD0iMzQuNSIgY3k9IjI5LjUiIHI9IjIwLjUiLz4KIDxjaXJjbGUgc3R5bGU9Im9wYWNpdHk6LjIiIGN4PSIzMiIgY3k9IjMzIiByPSIxNCIvPgogPGNpcmNsZSBzdHlsZT0iZmlsbDojZmZmZmZmIiBjeD0iMzIiIGN5PSIzMiIgcj0iMTQiLz4KIDxwYXRoIHN0eWxlPSJmaWxsOiM2OTFmNjkiIHRyYW5zZm9ybT0ibWF0cml4KDEuNTE1NTQ0NSwwLDAsMS41LC0zLjY1Mzg3OSwtNC45ODczODQ4KSIgZD0ibTI3LjE1NDUxNyAyNC42NTgyNTctMy40NjQxMDEgMi0zLjQ2NDEwMiAxLjk5OTk5OXYtNC0zLjk5OTk5OWwzLjQ2NDEwMiAyeiIvPgogPHBhdGggc3R5bGU9ImZpbGw6I2ZmZmZmZjtvcGFjaXR5Oi4xIiBkPSJNIDMyIDQgQSAyOCAyOCAwIDAgMCA0IDMyIEEgMjggMjggMCAwIDAgNC4wMjE0ODQ0IDMyLjU4NTkzOCBBIDI4IDI4IDAgMCAxIDMyIDUgQSAyOCAyOCAwIDAgMSA1OS45Nzg1MTYgMzIuNDE0MDYyIEEgMjggMjggMCAwIDAgNjAgMzIgQSAyOCAyOCAwIDAgMCAzMiA0IHoiLz4KPC9zdmc+Cg==
@@ -466,7 +466,7 @@ function resolveContextMenuStreamLink(menuContent) {
   );
 }
 
-function injectPlayOnMpvContextOption(menuContent) {
+function injectPlayOnMpvContextOption(menuContent, streamLink) {
   if (menuContent.querySelector('[data-mpv-context-option="true"]')) {
     return;
   }
@@ -477,7 +477,6 @@ function injectPlayOnMpvContextOption(menuContent) {
     return;
   }
 
-  const streamLink = resolveContextMenuStreamLink(menuContent);
   const mpvHandlerUrl = getMpvHandlerUrlFromLink(streamLink);
 
   if (!streamLink || !mpvHandlerUrl) {
@@ -508,14 +507,18 @@ function injectPlayOnMpvContextOption(menuContent) {
     true,
   );
 
-  menuContent.appendChild(option);
+  // Insert as first child to place at top of menu
+  menuContent.insertBefore(option, menuContent.firstChild);
 }
 
 function enhanceContextMenus() {
   const menuContents = document.querySelectorAll(".context-menu-content-Xe_lN");
 
   menuContents.forEach((menuContent) => {
-    injectPlayOnMpvContextOption(menuContent);
+    const streamLink = resolveContextMenuStreamLink(menuContent);
+    if (streamLink) {
+      injectPlayOnMpvContextOption(menuContent, streamLink);
+    }
   });
 }
 
@@ -527,6 +530,14 @@ function trackContextMenuTarget() {
 
       if (streamLink) {
         lastContextMenuStreamLink = streamLink;
+        
+        // Immediately inject option when context menu is triggered
+        requestAnimationFrame(() => {
+          const menuContent = document.querySelector(".context-menu-content-Xe_lN");
+          if (menuContent) {
+            injectPlayOnMpvContextOption(menuContent, streamLink);
+          }
+        });
       }
     },
     true,
