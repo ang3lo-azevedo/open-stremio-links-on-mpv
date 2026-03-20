@@ -9,10 +9,11 @@ A userscript that automatically converts Stremio Web stream links to open direct
 - **MPV Integration**: Uses mpv-handler protocol for direct MPV player launch
 - **In-page Launch Toast**: Shows a website toast when a stream is being opened in MPV
 - **Multi-language Support**: Available in English, Portuguese (Brazil), and Portuguese (Portugal)
+- **Native Settings Integration** (v4.8+): Configure directly in Stremio's settings panel for seamless user experience
 - **Quality Control**: Configure preferred video quality settings
 - **Profile Support**: Use custom MPV profiles
 - **Console Options**: Choose whether to show MPV console
-- **Easy Configuration**: Access settings through Tampermonkey/Greasemonkey menu
+- **Easy Configuration**: Settings persist across sessions
 - **Real-time Processing**: Automatically processes new links as they appear on the page
 
 ## Requirements
@@ -53,16 +54,29 @@ The script enhances the right-click context menu:
 
 ### Configuration
 
-Access configuration through your userscript manager menu:
+#### Native Stremio Settings (v4.8+)
+Settings are now integrated directly into Stremio's native settings panel for a seamless experience:
+
+1. **Open Stremio Settings**: Navigate to [web.stremio.com](https://web.stremio.com/#/settings) or [stremio.zarg.me](https://stremio.zarg.me/#/settings)
+2. **Scroll to "MPV Player" Section**: Find the new "MPV Player" section at the bottom of the settings
+3. **Configure Your Preferences**:
+   - **MPV Profile**: Choose MPV profile (`default` or custom profile name)
+   - **Prefer Video Quality**: Select preferred quality (`default`, `2160p`, `1440p`, `1080p`, `720p`, `480p`, `360p`)
+   - **Run With Console**: Show MPV console (`yes` or `no`)
+4. **Settings Auto-Save**: Changes are applied immediately
+
+#### Tampermonkey Menu (Alternative)
+You can still access settings through your userscript manager menu if needed:
 
 **Tampermonkey/Greasemonkey Menu Options:**
-- **MPV Settings**: Configure script preferences
+- **MPV Settings**: Opens the legacy configuration dialog (for backwards compatibility)
 - **Process Links Manually**: Force manual processing if needed
 
 **Available Settings:**
 - **MPV Profile**: Choose MPV profile (`default` or custom profile name)
 - **Prefer Video Quality**: Select preferred quality (`default`, `2160p`, `1440p`, `1080p`, `720p`, `480p`, `360p`)
 - **Run With Console**: Show MPV console (`yes` or `no`)
+
 
 ## Supported Sites
 
@@ -104,7 +118,7 @@ Open browser developer console (F12) to see script debug information and process
 
 ## Technical Details
 
-- **Version**: 4.6
+- **Version**: 4.8
 - **mpv-handler Version**: v0.3.15
 - **Supported Browsers**: Chrome, Firefox, Edge, Safari (with appropriate userscript managers)
 - **Dependencies**: GM_config library for settings management
@@ -122,6 +136,18 @@ MIT License - see the script header for full license text.
 Ângelo Azevedo
 
 ## Changelog
+
+### v4.8
+- Integrated settings directly into Stremio's native settings panel
+- Settings now appear in "MPV Player" section at the bottom of Stremio settings
+- Seamless UI experience matching Stremio's design language
+- Settings automatically save when changed in the settings panel
+- Backwards compatible with legacy Tampermonkey menu option
+
+### v4.7
+- Enhanced notification system for better user feedback
+- Improved script initialization and error handling
+- Better support for Stremio's modern interface
 
 ### v4.6
 - Optimized context menu injection for instant display

@@ -8,7 +8,7 @@
 // @description:pt-BR   Substitui os links quando a opção "M3U Playlist" está ativa e os abre no MPV via mpv-handler
 // @description:pt-PT   Substitui as ligações quando a opção "M3U Playlist" está activa e abre-as no MPV via mpv-handler
 // @namespace           open-stremio-links-on-mpv
-// @version             4.6
+// @version             4.8
 // @author              Ângelo Azevedo
 // @license             MIT License
 // @icon                data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmVyc2lvbj0iMSI+CiA8Y2lyY2xlIHN0eWxlPSJvcGFjaXR5Oi4yIiBjeD0iMzIiIGN5PSIzMyIgcj0iMjgiLz4KIDxjaXJjbGUgc3R5bGU9ImZpbGw6IzhkMzQ4ZSIgY3g9IjMyIiBjeT0iMzIiIHI9IjI4Ii8+CiA8Y2lyY2xlIHN0eWxlPSJvcGFjaXR5Oi4zIiBjeD0iMzQuNSIgY3k9IjI5LjUiIHI9IjIwLjUiLz4KIDxjaXJjbGUgc3R5bGU9Im9wYWNpdHk6LjIiIGN4PSIzMiIgY3k9IjMzIiByPSIxNCIvPgogPGNpcmNsZSBzdHlsZT0iZmlsbDojZmZmZmZmIiBjeD0iMzIiIGN5PSIzMiIgcj0iMTQiLz4KIDxwYXRoIHN0eWxlPSJmaWxsOiM2OTFmNjkiIHRyYW5zZm9ybT0ibWF0cml4KDEuNTE1NTQ0NSwwLDAsMS41LC0zLjY1Mzg3OSwtNC45ODczODQ4KSIgZD0ibTI3LjE1NDUxNyAyNC42NTgyNTctMy40NjQxMDEgMi0zLjQ2NDEwMiAxLjk5OTk5OXYtNC0zLjk5OTk5OWwzLjQ2NDEwMiAyeiIvPgogPHBhdGggc3R5bGU9ImZpbGw6I2ZmZmZmZjtvcGFjaXR5Oi4xIiBkPSJNIDMyIDQgQSAyOCAyOCAwIDAgMCA0IDMyIEEgMjggMjggMCAwIDAgNC4wMjE0ODQ0IDMyLjU4NTkzOCBBIDI4IDI4IDAgMCAxIDMyIDUgQSAyOCAyOCAwIDAgMSA1OS45Nzg1MTYgMzIuNDE0MDYyIEEgMjggMjggMCAwIDAgNjAgMzIgQSAyOCAyOCAwIDAgMCAzMiA0IHoiLz4KPC9zdmc+Cg==
@@ -173,6 +173,170 @@ GM_config.init({
   },
   css: CONFIG_CSS.trim(),
 });
+
+// Inject MPV settings into Stremio's native settings panel
+function injectStremioSettings() {
+  // Look for the settings panel container
+  const settingsPanels = document.querySelectorAll('[class*="settings-container"]');
+  
+  if (settingsPanels.length === 0) {
+    return;
+  }
+
+  const settingsContainer = settingsPanels[0];
+  
+  // Check if we've already injected our settings
+  if (settingsContainer.querySelector('[data-mpv-settings]')) {
+    return;
+  }
+
+  // Find all settings sections to understand the structure
+  const sections = settingsContainer.querySelectorAll('[class*="section-"]');
+  
+  if (sections.length === 0) {
+    return;
+  }
+
+  // Create MPV settings section matching Stremio's style
+  const mpvSection = document.createElement('div');
+  mpvSection.setAttribute('data-mpv-settings', 'true');
+  mpvSection.setAttribute('class', sections[0].getAttribute('class'));
+  mpvSection.style.marginTop = '24px';
+  
+  // Create section title
+  const sectionTitle = document.createElement('div');
+  sectionTitle.setAttribute('class', sections[0].querySelector('[class*="section-"]')?.getAttribute('class') || 'section-title');
+  sectionTitle.textContent = 'MPV Player';
+  sectionTitle.style.fontSize = '14px';
+  sectionTitle.style.fontWeight = '500';
+  sectionTitle.style.marginBottom = '16px';
+  sectionTitle.style.color = 'rgba(255, 255, 255, 0.7)';
+  
+  mpvSection.appendChild(sectionTitle);
+
+  // Create options container
+  const optionsContainer = document.createElement('div');
+  
+  // Profile setting
+  const profileOption = createSettingOption('profile', 'MPV Profile', 'text', null);
+  optionsContainer.appendChild(profileOption);
+  
+  // Quality setting
+  const qualityOption = createSettingOption('quality', 'Prefer Video Quality', 'select', CONFIG_FIELDS.quality.options);
+  optionsContainer.appendChild(qualityOption);
+  
+  // Console setting
+  const consoleOption = createSettingOption('console', 'Run With Console', 'select', CONFIG_FIELDS.console.options);
+  optionsContainer.appendChild(consoleOption);
+  
+  mpvSection.appendChild(optionsContainer);
+  
+  // Add to settings container
+  settingsContainer.appendChild(mpvSection);
+}
+
+// Create a single settings option element
+function createSettingOption(fieldName, label, type, options) {
+  const optionContainer = document.createElement('div');
+  optionContainer.setAttribute('class', 'mpv-setting-option');
+  optionContainer.style.marginBottom = '16px';
+  optionContainer.style.display = 'flex';
+  optionContainer.style.alignItems = 'center';
+  optionContainer.style.justifyContent = 'space-between';
+  
+  // Create label
+  const labelEl = document.createElement('label');
+  labelEl.textContent = label;
+  labelEl.style.fontSize = '14px';
+  labelEl.style.color = 'rgba(255, 255, 255, 0.9)';
+  labelEl.style.flex = '1';
+  
+  // Create input
+  let inputEl;
+  const currentValue = GM_config.get(fieldName);
+  
+  if (type === 'select') {
+    inputEl = document.createElement('select');
+    inputEl.style.padding = '6px 8px';
+    inputEl.style.borderRadius = '4px';
+    inputEl.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+    inputEl.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+    inputEl.style.color = 'rgba(255, 255, 255, 0.9)';
+    inputEl.style.fontSize = '14px';
+    inputEl.style.cursor = 'pointer';
+    
+    options.forEach(opt => {
+      const optionEl = document.createElement('option');
+      optionEl.value = opt;
+      optionEl.textContent = opt;
+      optionEl.selected = opt === currentValue;
+      inputEl.appendChild(optionEl);
+    });
+    
+    inputEl.addEventListener('change', (e) => {
+      GM_config.set(fieldName, e.target.value);
+    });
+  } else if (type === 'text') {
+    inputEl = document.createElement('input');
+    inputEl.type = 'text';
+    inputEl.value = currentValue;
+    inputEl.style.padding = '6px 8px';
+    inputEl.style.borderRadius = '4px';
+    inputEl.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+    inputEl.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+    inputEl.style.color = 'rgba(255, 255, 255, 0.9)';
+    inputEl.style.fontSize = '14px';
+    inputEl.style.width = '200px';
+    
+    inputEl.addEventListener('change', (e) => {
+      let value = e.target.value.trim();
+      if (value === '') {
+        value = 'default';
+        inputEl.value = value;
+      }
+      GM_config.set(fieldName, value);
+    });
+  }
+  
+  optionContainer.appendChild(labelEl);
+  optionContainer.appendChild(inputEl);
+  
+  return optionContainer;
+}
+
+// Watch for settings panel and inject our settings
+function setupSettingsIntegration() {
+  // Try to inject immediately
+  injectStremioSettings();
+  
+  // Watch for hash changes to detect settings panel navigation
+  window.addEventListener('hashchange', () => {
+    if (window.location.hash.includes('settings')) {
+      // Wait a bit for the panel to render
+      setTimeout(injectStremioSettings, 100);
+    }
+  });
+  
+  // Also watch for DOM mutations to catch dynamic panel creation
+  const settingsObserver = new MutationObserver(() => {
+    injectStremioSettings();
+  });
+  
+  // Start observing when we detect the settings panel root
+  const checkForSettingsPanel = setInterval(() => {
+    const panel = document.querySelector('[class*="settings-container"]');
+    if (panel) {
+      settingsObserver.observe(panel.parentNode || document.body, {
+        childList: true,
+        subtree: true,
+      });
+      clearInterval(checkForSettingsPanel);
+    }
+  }, 500);
+  
+  // Clear the interval after 30 seconds to avoid infinite checking
+  setTimeout(() => clearInterval(checkForSettingsPanel), 30000);
+}
 
 // URL-safe base64 encode
 function btoaUrl(url) {
@@ -496,7 +660,7 @@ function injectPlayOnMpvContextOption(menuContent, streamLink) {
     "click",
     (event) => {
       event.preventDefault();
-      event.stopPropagation();
+      event.stohttps://web.stremio.com/#/settingspPropagation();
 
       notifyOpeningInMpv(streamLink);
 
@@ -507,8 +671,13 @@ function injectPlayOnMpvContextOption(menuContent, streamLink) {
     true,
   );
 
-  // Insert as first child to place at top of menu
-  menuContent.insertBefore(option, menuContent.firstChild);
+  // Insert after the title and before the first Play button
+  const titleElement = menuContent.querySelector(".context-menu-title-aoWE4");
+  if (titleElement && titleElement.nextElementSibling) {
+    menuContent.insertBefore(option, titleElement.nextElementSibling);
+  } else {
+    menuContent.insertBefore(option, menuContent.firstChild);
+  }
 }
 
 function enhanceContextMenus() {
@@ -531,13 +700,11 @@ function trackContextMenuTarget() {
       if (streamLink) {
         lastContextMenuStreamLink = streamLink;
         
-        // Immediately inject option when context menu is triggered
-        requestAnimationFrame(() => {
-          const menuContent = document.querySelector(".context-menu-content-Xe_lN");
-          if (menuContent) {
-            injectPlayOnMpvContextOption(menuContent, streamLink);
-          }
-        });
+        // Inject option immediately without async delay
+        const menuContent = document.querySelector(".context-menu-content-Xe_lN");
+        if (menuContent) {
+          injectPlayOnMpvContextOption(menuContent, streamLink);
+        }
       }
     },
     true,
@@ -622,6 +789,7 @@ if (window.trustedTypes && window.trustedTypes.createPolicy) {
 // Initialize the script
 function init() {
   notifyUpdate();
+  setupSettingsIntegration();
   registerMenuCommands();
   trackContextMenuTarget();
   startObserver();
