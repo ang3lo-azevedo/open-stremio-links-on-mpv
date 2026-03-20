@@ -8,7 +8,7 @@
 // @description:pt-BR   Substitui os links quando a opção "M3U Playlist" está ativa e os abre no MPV via mpv-handler
 // @description:pt-PT   Substitui as ligações quando a opção "M3U Playlist" está activa e abre-as no MPV via mpv-handler
 // @namespace           open-stremio-links-on-mpv
-// @version             4.0
+// @version             4.1
 // @author              Ângelo Azevedo
 // @license             MIT License
 // @icon                data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmVyc2lvbj0iMSI+CiA8Y2lyY2xlIHN0eWxlPSJvcGFjaXR5Oi4yIiBjeD0iMzIiIGN5PSIzMyIgcj0iMjgiLz4KIDxjaXJjbGUgc3R5bGU9ImZpbGw6IzhkMzQ4ZSIgY3g9IjMyIiBjeT0iMzIiIHI9IjI4Ii8+CiA8Y2lyY2xlIHN0eWxlPSJvcGFjaXR5Oi4zIiBjeD0iMzQuNSIgY3k9IjI5LjUiIHI9IjIwLjUiLz4KIDxjaXJjbGUgc3R5bGU9Im9wYWNpdHk6LjIiIGN4PSIzMiIgY3k9IjMzIiByPSIxNCIvPgogPGNpcmNsZSBzdHlsZT0iZmlsbDojZmZmZmZmIiBjeD0iMzIiIGN5PSIzMiIgcj0iMTQiLz4KIDxwYXRoIHN0eWxlPSJmaWxsOiM2OTFmNjkiIHRyYW5zZm9ybT0ibWF0cml4KDEuNTE1NTQ0NSwwLDAsMS41LC0zLjY1Mzg3OSwtNC45ODczODQ4KSIgZD0ibTI3LjE1NDUxNyAyNC42NTgyNTctMy40NjQxMDEgMi0zLjQ2NDEwMiAxLjk5OTk5OXYtNC0zLjk5OTk5OWwzLjQ2NDEwMiAyeiIvPgogPHBhdGggc3R5bGU9ImZpbGw6I2ZmZmZmZjtvcGFjaXR5Oi4xIiBkPSJNIDMyIDQgQSAyOCAyOCAwIDAgMCA0IDMyIEEgMjggMjggMCAwIDAgNC4wMjE0ODQ0IDMyLjU4NTkzOCBBIDI4IDI4IDAgMCAxIDMyIDUgQSAyOCAyOCAwIDAgMSA1OS45Nzg1MTYgMzIuNDE0MDYyIEEgMjggMjggMCAwIDAgNjAgMzIgQSAyOCAyOCAwIDAgMCAzMiA0IHoiLz4KPC9zdmc+Cg==
@@ -375,14 +375,29 @@ function extractStreamUrl(linkUrl) {
   return null;
 }
 
+function bindMpvClick(link) {
+  if (link.dataset.clickBound === "true") {
+    return;
+  }
+
+  link.dataset.clickBound = "true";
+  link.target = "_self";
+
+  link.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    window.location.href = link.href;
+  });
+}
+
 // Function to process links with enhanced mpv-handler integration
 function processLinks() {
-  const links = document.querySelectorAll('a[href^="data:application/octet-stream;charset=utf-8;base64,"], a[href*="#/player/"]');
+  const links = document.querySelectorAll('a[href^="data:application/octet-stream;charset=utf-8;base64,"], a[href*="#/player/"], a[href^="mpv-handler://"], a[href^="mpv-handler-debug://"]');
   let processedCount = 0;
 
-  links.forEach((link, index) => {
-    // Check if the link has already been processed and actually has an mpv-handler:// URL
-    if (link.dataset.processed === 'true' && (link.href.startsWith('mpv-handler://') || link.href.startsWith('mpv-handler-debug://'))) {
+  links.forEach((link) => {
+    if (link.href.startsWith("mpv-handler://") || link.href.startsWith("mpv-handler-debug://")) {
+      bindMpvClick(link);
       return;
     }
 
@@ -397,17 +412,9 @@ function processLinks() {
       
       // Update the new link
       newLink.href = mpvHandlerUrl;
-      newLink.dataset.processed = 'true';
+      newLink.dataset.processed = "true";
+      bindMpvClick(newLink);
       processedCount++;
-
-      // Add single click event listener
-      newLink.addEventListener('click', (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        
-        // Try to open with mpv-handler
-        window.location.href = mpvHandlerUrl;
-      }, { once: true }); // Use 'once' option to ensure it only fires once
     }
   });
 }
